@@ -1,0 +1,13 @@
+@font-face {
+  font-family:OverusedGrotesk;
+  src: url(../public/fonts/OverusedGrotesk-SemiBold.ttf);
+  src: url(../public/fonts/OverusedGrotesk-Light.ttf);
+}
+*{
+  font-family: OverusedGrotesk;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; 
+}
