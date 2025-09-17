@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import EmailStep from "./components/EmailStep";
 import PasswordStep from "./components/PasswordStep";
 import Dashboard from "./components/Dashboard";

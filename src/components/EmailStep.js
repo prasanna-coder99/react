@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
+
 
 function EmailStep() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!email) {
       setError("Please enter email address");
       return;
     }
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      setError("Enter a valid email address");
+      setError("Please Enter a valid email address");
       return;
     }
-    setError("");
-    localStorage.setItem("email", email);
-    navigate("/password");
-  };
+     setError("");
+    setLoading(true);
+    try {
+   
+    const response = await axios.post("https://881ed8dd43b2.ngrok-free.app/api/check_email", { email });
+
+if (response.data.exists) {
+      setError("");
+      localStorage.setItem("email", email);
+      navigate("/password");
+    } else {
+      setError("Email not found");
+    }
+  } catch (err) {
+    console.error(err);
+    setError("Unable to verify email. Please try again.");
+  }
+};
 
   return (
 
@@ -61,7 +78,7 @@ function EmailStep() {
         <p className="text-center" style={{ 
           color: '#0A1E06',
           fontSize: '16px',
-          fontWeight: 400,
+          fontWeight:300,
           gap:'49px',
         }}>
           Please enter your registered Email to Login
