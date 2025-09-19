@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
@@ -12,6 +12,13 @@ function PasswordStep() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const navigate = useNavigate();
+
+    useEffect(() => {
+    const canAccess = sessionStorage.getItem("passwordEntered");
+    if (!canAccess) {
+      navigate("/");   
+    }
+  }, [navigate]);
 
   const handleLogin = async () => {
     setPasswordError("");
@@ -33,36 +40,43 @@ function PasswordStep() {
       console.log("Login request with:", { email, password });
 
       const response = await axios.post(
-        "https://881ed8dd43b2.ngrok-free.app/api/auth/login",
+        "https://e6f2c7d56ba3.ngrok-free.app/api/auth/login",
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );
-
+      if (response.data.token) {
       const token = response.data.token;
       localStorage.setItem("token", token);
-
+      
+      localStorage.setItem("passwordEntered", "true");
       setMessage("Login successful. Redirecting...");
       setMessageType("success");
 
       const detailsResponse = await axios.get(
-        "https://881ed8dd43b2.ngrok-free.app/api/details",
+        "https://e6f2c7d56ba3.ngrok-free.app/api/details",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("User details:", detailsResponse.data);
 
       setTimeout(() => navigate("/dashboard"), 1000);
+    } else {
+   
+    setMessage("Invalid email or password");
+    setMessageType("error");
+  }
 
     } catch (error) {
       if (error.response) {
-        console.error("Backend error:", error.response.data);
-        setMessage(error.response.data.message || "Invalid email or password");
-        setMessageType("error");
+       
+        setMessage(error.response.data.message || "Invalid  password");
+        
       } else {
-        console.error("Network error:", error.message);
+        
         setMessage("Server not reachable. Please try again later.");
+      }
         setMessageType("error");
       }
-    }
+    
   };
 
   const handleBack = () => {

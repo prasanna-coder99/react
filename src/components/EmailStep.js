@@ -10,7 +10,11 @@ function EmailStep() {
    const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleNext = async () => {
+    const handleNext = async (e) => {
+      e.preventDefault();
+      setError("");
+       
+   
     if (!email) {
       setError("Please enter email address");
       return;
@@ -20,24 +24,30 @@ function EmailStep() {
       setError("Please Enter a valid email address");
       return;
     }
-     setError("");
+    setError("");
     setLoading(true);
     try {
-   
-    const response = await axios.post("https://881ed8dd43b2.ngrok-free.app/api/check_email", { email });
+      const response = await axios.post(
+        "https://e6f2c7d56ba3.ngrok-free.app/api/check_email",
+        { email }
+      );
+    console.log("API response:", response.data); 
+    if (response.data.exists) {
+        localStorage.setItem("email", email);
+       sessionStorage.setItem("passwordEntered", "true");
+         console.log("Navigating to password page");
+        navigate("/password");
 
-if (response.data.exists) {
-      setError("");
-      localStorage.setItem("email", email);
-      navigate("/password");
-    } else {
-      setError("Email not found");
+      } else {
+        setError("Email not found");
+      }
+    } catch (err) {
+      console.error("API Error:", err);
+      setError("Unable to verify email. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error(err);
-    setError("Unable to verify email. Please try again.");
-  }
-};
+  };
 
   return (
 
@@ -83,7 +93,7 @@ if (response.data.exists) {
         }}>
           Please enter your registered Email to Login
         </p>
-
+       
         <div 
           className="d-flex align-items-center" 
           style={{ 
@@ -150,6 +160,9 @@ if (response.data.exists) {
         )}
 
         <button
+        type='button'
+        onClick={handleNext} 
+        disabled={loading}
           className="btn btn-primary rounded-pill mt-3"
           style={{
             width: '100px',
@@ -160,9 +173,8 @@ if (response.data.exists) {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          onClick={handleNext}
-        >
-          Next
+         >
+  {loading ? "Checking..." : "Next"}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
